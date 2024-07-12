@@ -1,0 +1,65 @@
+# Default values for services.
+replicaCount: 1
+
+image:
+  repository: nginx
+  pullPolicy: IfNotPresent
+  tag: ""
+
+imagePullSecrets: []
+
+name: "name-your-application"
+appVersion: "app-version"
+
+serviceAccount: []
+
+podAnnotations: {}
+podLabels: {}
+
+podSecurityContext: {}
+# fsGroup: 2000
+
+securityContext: {}
+# capabilities:
+#   drop:
+#   - ALL
+# readOnlyRootFilesystem: true
+# runAsNonRoot: true
+# runAsUser: 1000
+
+# Can create one or multiple configMaps
+configMaps: []
+
+# Can create one or multiple Cronjobs
+cronjobs: []
+
+# Can create one or multiple secrets
+secrets: []
+
+# Can create one or multiple services
+services: []
+
+# Can create one or multiple ingresses
+ingress: []
+
+deployment: []
+
+resources: {}
+
+livenessProbe: []
+
+readinessProbe: []
+
+hpa: []
+
+# Additional volumes on the output Deployment definition. Can create one or multiple volumes
+volumes: []
+
+# Additional volumeMounts on the output Deployment definition. Can create one or multiple volumeMounts
+volumeMounts: []
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

@@ -1,0 +1,29 @@
+{{- if .Values.cronjobs }}
+{{- range $name, $cronjob := .Values.cronjobs }}
+{{- if $cronjob.enabled }}
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ $name }}
+  labels:
+    {{- include "app.labels" $ }}
+spec:
+  schedule: "{{ $cronjob.schedule }}"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: {{ $name }}-container
+            image: {{ $cronjob.image }}
+            imagePullPolicy: {{ $cronjob.imagePullPolicy }}
+            env:
+              - name: EXAMPLE_ENV
+                value: "{{ $cronjob.env.EXAMPLE_ENV }}"
+            command: {{ toJson $cronjob.command }}
+            args: {{ toJson $cronjob.args }}
+          restartPolicy: {{ $cronjob.restartPolicy }}
+{{- end }}
+{{- end }}
+{{- end }}
