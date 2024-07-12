@@ -45,11 +45,11 @@ app/
 └── charts/
 ```
 
-## Default Values - Example
+## Default Values
 
 The `values.yaml` file contains the default values used to configure the Kubernetes resources. You can adjust these values as needed.
 
-```
+```yaml
 replicaCount: 1
 
 image:
@@ -237,3 +237,63 @@ affinity: {}
 You can configure resources such as ConfigMaps, CronJobs, Secrets, Services, Ingresses, Volumes, and VolumeMounts individually or in multiples as needed.
 
 The `enabled` option is a key feature in the `values.yaml` files of a Helm Chart, allowing control over whether a specific resource should be deployed or not. This option is particularly useful for flexibly configuring which resources are activated or deactivated in different environments or deployment scenarios. This function is available for these resources: ConfigMaps, CronJobs, Secrets, Services, Ingresses, HPA, and Deployment.
+
+The sections `podSecurityContext` and `securityContext` are not mandatory. These configurations provide security contexts for your pods and containers, which can help enforce security policies. However, they can be left empty or omitted if not needed.
+
+## Installing Helm
+
+To install Helm on your machine, follow these steps:
+
+1. Download Helm:
+
+```bash
+$ curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+```
+
+2. Verify the installation:
+
+```bash
+$ helm version
+```
+
+## Testing the Values Template
+
+To test the template with your custom values.yaml, you can use the following command with the --debug flag to render the templates locally and see the output without deploying it:
+
+### Code:
+
+```bash
+$ helm template --debug ./app -f values.yaml
+```
+
+This will help you validate the configurations and see what Kubernetes manifests will be generated from your `values.yaml` file.
+
+## Deploying the Configured Values to Kubernetes
+
+To deploy the configured values.yaml file to your Kubernetes cluster, use the helm install command as follows:
+
+### Code:
+
+```bash
+$ helm install my-release ./app -f values.yaml
+```
+
+Replace `<release-name>` with a name for your Helm release. This command will apply the configurations specified in your values.yaml and create the corresponding Kubernetes resources in your cluster.
+
+## Using in a CI/CD Pipeline
+
+This Helm Chart can be integrated into your CI/CD pipeline to automate deployments. Here is an example of how you might include it in a pipeline script:
+
+```yaml
+stages:
+  - deploy
+
+deploy:
+  stage: deploy
+  script:
+    - helm upgrade --install my-release ./app -f values.yaml
+  only:
+    - main
+```
+
+In this example, the Helm Chart is upgraded or installed with the values.yaml configuration whenever changes are pushed to the main branch.
