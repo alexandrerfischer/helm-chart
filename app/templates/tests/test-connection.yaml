@@ -1,0 +1,20 @@
+{{- range .Values.services }}
+{{- if .enabled }}
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{ .name }}-test-connection"
+  labels:
+    {{- include "app.labels" $ }}
+  annotations:
+    "helm.sh/hook": test
+spec:
+  containers:
+    - name: wget
+      image: busybox
+      command: ['wget']
+      args: ['{{ .name }}:{{ (index .ports 0).port }}']
+  restartPolicy: Never
+{{- end }}
+{{- end }}

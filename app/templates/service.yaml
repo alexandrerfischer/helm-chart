@@ -1,0 +1,22 @@
+{{- range .Values.services }}
+{{- if .enabled }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .name }}
+  labels:
+    {{- include "app.labels" $ }}
+spec:
+  type: {{ .type }}
+  ports:
+    {{- range .ports }}
+    - port: {{ .port }}
+      targetPort: {{ .targetPort }}
+      protocol: TCP
+      name: {{ .name }}
+    {{- end }}
+  selector:
+    {{- include "app.selectorLabels" $ | nindent 4 }}
+{{- end }}
+{{- end }}
