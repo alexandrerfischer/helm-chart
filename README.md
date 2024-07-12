@@ -45,7 +45,7 @@ app/
 └── charts/
 ```
 
-## Default Values
+## Default Values - Example
 
 The `values.yaml` file contains the default values used to configure the Kubernetes resources. You can adjust these values as needed.
 
