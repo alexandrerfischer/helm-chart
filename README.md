@@ -295,5 +295,3 @@ deploy:
   only:
     - main
 ```
-
-In this example, the Helm Chart is upgraded or installed with the values.yaml configuration whenever changes are pushed to the main branch.
