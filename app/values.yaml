@@ -1,58 +1,121 @@
-# Default values for services.
-replicaCount: 1
+# Default values for app.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
 
+# Image configuration
 image:
-  repository: nginx
-  pullPolicy: IfNotPresent
+  repository: ""
   tag: ""
+  pullPolicy: ""
 
-imagePullSecrets: []
+imagePullSecrets:
+  - name: artifact-registry-secret
 
-name: "name-your-application"
-appVersion: "app-version"
+# Replica count
+replicaCount: 0
 
-serviceAccount: []
+# Service configuration
+service:
+  name: ""
+  type: ""
+  port: 0
+  targetport: 0
 
-podAnnotations: {}
-podLabels: {}
+servicelb:
+  name: ""
+  port: 0
+  targetport: 0
 
-podSecurityContext: {}
+# Health check configuration
+healthcheck:
+  type: ""
+  path: ""
 
-securityContext: {}
+# HPA configuration
+hpa:
+  min: 0
+  max: 0
+  cputarget: 0
+  memorytarget: 0
 
-# Can create one or multiple configMaps
-configMaps: []
+# Service account configuration
+serviceAccount:
+  name: ""
 
-# Can create one or multiple Cronjobs
-cronjobs: []
+# ConfigMap configuration
+configMaps:
+  - name: ""
+    enabled: false
+    data:
+      key1: ""
+      key2: ""
 
-# Can create one or multiple secrets
-secrets: []
+# CronJob configuration
+cronjobs:
+  my-cronjob:
+    enabled: false
+    schedule: ""
+    image: ""
+    imagePullPolicy: ""
+    env:
+      ENV_VAR: ""
+    command: []
+    args: []
+    restartPolicy: ""
 
-# Can create one or multiple services
-services: []
+# Ingress configuration
+ingress:
+  name: ""
+  namespace: ""
+  ingressClassName: ""
+  host: ""
+  tlsSecretName: ""
 
-# Can create one or multiple ingresses
-ingress: []
+# Secrets configuration
+secrets:
+  - name: ""
+    enabled: false
+    data:
+      username: ""
+      password: ""
 
-deployment: []
+# Resources configuration
+resources:
+  requests:
+    cpu: ""
+    memory: ""
+  limits:
+    cpu: ""
+    memory: ""
 
-resources: {}
-
-livenessProbe: []
-
-readinessProbe: []
-
-hpa: []
-
-# Additional volumes on the output Deployment definition. Can create one or multiple volumes
-volumes: []
-
-# Additional volumeMounts on the output Deployment definition. Can create one or multiple volumeMounts
-volumeMounts: []
-
+# Node selector configuration
 nodeSelector: {}
 
-tolerations: []
-
+# Affinity configuration
 affinity: {}
+
+# Tolerations configuration
+tolerations:
+  - key: ""
+    operator: ""
+    value: ""
+    effect: ""
+
+# Persistence configuration
+persistence:
+  enabled: false
+  claims:
+    - name: ""
+      accessMode: ""
+      size: 0
+      storageClass: ""
+
+# Volume mounts
+volumemounts:
+  - name: ""
+    mountPath: ""
+
+# Volumes
+volumes:
+  - name: ""
+    emptyDir: {}

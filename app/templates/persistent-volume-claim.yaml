@@ -1,0 +1,18 @@
+{{- if and .Values.persistence.enabled .Values.persistence.claims }}
+{{- range .Values.persistence.claims }}
+{{- if .enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .name }}
+spec:
+  accessModes:
+    - {{ .accessMode | default "ReadWriteOnce" }}
+  resources:
+    requests:
+      storage: {{ .size | default "5Gi" }}
+  storageClassName: {{ .storageClass | default "local-path" }}
+---
+{{- end }}
+{{- end }}
+{{- end }}

@@ -1,25 +1,37 @@
+# NOTES:
+# This file provides instructions on how to obtain the application URL depending on the service type.
+# It covers Ingress, NodePort, LoadBalancer, and ClusterIP scenarios.
+
 1. Get the application URL by running these commands:
+
 {{- if .Values.ingress.enabled }}
-{{- range $host := .Values.ingress.hosts }}
-  {{- range .paths }}
-  http{{ if $.Values.ingress.tls }}s{{ end }}://{{ $host.host }}{{ .path }}
+  # If Ingress is enabled, this block generates the URL(s) based on the Ingress host and path configuration.
+  # It automatically switches between HTTP and HTTPS based on the TLS settings in the Ingress configuration.
+  {{- range $host := .Values.ingress.hosts }}
+    {{- range .paths }}
+    http{{ if $.Values.ingress.tls }}s{{ end }}://{{ $host.host }}{{ . }}
+    {{- end }}
   {{- end }}
-{{- end }}
-{{- else if .Values.service }}
-{{- if contains "NodePort" .Values.service.type }}
-  export NODE_PORT=$(kubectl get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ include "app.fullname" . }})
-  export NODE_IP=$(kubectl get nodes --namespace {{ .Release.Namespace }} -o jsonpath="{.items[0].status.addresses[0].address}")
-  echo "Visit your application at: http://$NODE_IP:$NODE_PORT"
-{{- else if contains "LoadBalancer" .Values.service.type }}
-     NOTE: It may take a few minutes for the LoadBalancer IP to be available.
-           You can watch its status by running 'kubectl get --namespace {{ .Release.Namespace }} svc -w {{ include "app.fullname" . }}'
-  export SERVICE_IP=$(kubectl get svc --namespace {{ .Release.Namespace }} {{ include "app.fullname" . }} --template "{{"{{ range (index .status.loadBalancer.ingress 0) }}{{.}}{{ end }}"}}")
-  echo "Visit your application at: http://$SERVICE_IP:{{ .Values.service.port }}"
-{{- else if contains "ClusterIP" .Values.service.type }}
-  export POD_NAME=$(kubectl get pods --namespace {{ .Release.Namespace }} -l "app.kubernetes.io/name={{ include "services.name" . }},app.kubernetes.io/instance={{ .Release.Name }}" -o jsonpath="{.items[0].metadata.name}")
-  export CONTAINER_PORT=$(kubectl get pod --namespace {{ .Release.Namespace }} $POD_NAME -o jsonpath="{.spec.containers[0].ports[0].containerPort}")
-  echo "Visit your application at: http://127.0.0.1:8080"
-  echo "Forwarding local port 8080 to $POD_NAME:80. Press CTRL+C to exit."
-  kubectl --namespace {{ .Release.Namespace }} port-forward $POD_NAME 8080:$CONTAINER_PORT
-{{- end }}
-{{- end }}
+
+{{- else if .Values.services }}                                # Verifica se existem serviços definidos
+  {{- $selectedService := index .Values.services .Values.selectedService }}  # Armazena o serviço selecionado
+  {{- if $selectedService }}
+    {{- if eq $selectedService.type "NodePort" }}
+      # If the service type is NodePort, this block fetches the external IP and the NodePort.
+      export NODE_PORT=$(kubectl get --namespace {{ default .Release.Namespace "default" }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ include "app.fullname" . }})
+      export NODE_IP=$(kubectl get nodes --namespace {{ default .Release.Namespace "default" }} -o jsonpath="{.items[0].status.addresses[0].address}")
+      echo http://$NODE_IP:$NODE_PORT
+
+    {{- else if eq $selectedService.type "LoadBalancer" }}
+      NOTE: It may take a few minutes for the LoadBalancer IP to be available.
+      You can watch the status by running 'kubectl get --namespace {{ default .Release.Namespace "default" }} svc -w {{ include "app.fullname" . }}'
+      export SERVICE_IP=$(kubectl get svc --namespace {{ default .Release.Namespace "default" }} {{ include "app.fullname" . }} --template "{{"{{ range (index .status.loadBalancer.ingress 0) }}{{.}}{{ end }}"}}")
+      echo http://$SERVICE_IP:{{ $selectedService.port }}
+
+    {{- else if eq $selectedService.type "ClusterIP" }}
+      export POD_NAME=$(kubectl get pods --namespace {{ default .Release.Namespace "default" }} -l "app.kubernetes.io/name={{ include "app.name" . }},app.kubernetes.io/instance={{ .Release.Name }}" -o jsonpath="{.items[0].metadata.name}")
+      echo "Visit http://127.0.0.1:8080 to use your application"
+      kubectl --namespace {{ default .Release.Namespace "default" }} port-forward $POD_NAME 8080:80
+    {{- end }}
+  {{- end }}                                # Fim da verificação do serviço selecionado
+{{- end }}                                  # Fim da verificação de serviços

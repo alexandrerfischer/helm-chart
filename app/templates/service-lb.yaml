@@ -1,0 +1,19 @@
+{{- if and .Values.servicelb.name .Values.servicelb.port .Values.servicelb.targetport }}
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    cloud.google.com/load-balancer-type: Internal
+  labels:
+    name: {{ .Values.servicelb.name }}
+  name: {{ .Values.servicelb.name }}
+  namespace: {{ .Values.servicelb.namespace }}
+spec:
+  type: LoadBalancer
+  ports:
+    - protocol: TCP
+      port: {{ .Values.servicelb.port }}
+      targetPort: {{ .Values.servicelb.targetport }}
+  selector:
+    name: {{ .Values.servicelb.name }}
+{{- end }}

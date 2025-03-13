@@ -17,13 +17,15 @@ spec:
           containers:
           - name: {{ $name }}-container
             image: {{ $cronjob.image }}
-            imagePullPolicy: {{ $cronjob.imagePullPolicy }}
+            imagePullPolicy: {{ $cronjob.imagePullPolicy | default "IfNotPresent" }}
             env:
-              - name: EXAMPLE_ENV
-                value: "{{ $cronjob.env.EXAMPLE_ENV }}"
-            command: {{ toJson $cronjob.command }}
-            args: {{ toJson $cronjob.args }}
-          restartPolicy: {{ $cronjob.restartPolicy }}
+              {{- range $key, $value := $cronjob.env }}
+              - name: {{ $key }}
+                value: "{{ $value }}"
+              {{- end }}
+            command: {{ toJson $cronjob.command | default (quote "echo 'No command specified'") }}
+            args: {{ toJson $cronjob.args | default (quote "[]") }}
+          restartPolicy: {{ $cronjob.restartPolicy | default "OnFailure" }}
 {{- end }}
 {{- end }}
 {{- end }}

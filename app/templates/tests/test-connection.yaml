@@ -1,20 +1,15 @@
-{{- range .Values.services }}
-{{- if .enabled }}
----
 apiVersion: v1
 kind: Pod
 metadata:
-  name: "{{ .name }}-test-connection"
+  name: "{{ include "app.fullname" . }}-test-connection"
   labels:
-    {{- include "app.labels" $ }}
+    {{- include "app.labels" . | nindent 4 }}
   annotations:
-    "helm.sh/hook": test
+    "helm.sh/hook": test-success
 spec:
   containers:
     - name: wget
       image: busybox
       command: ['wget']
-      args: ['{{ .name }}:{{ (index .ports 0).port }}']
+      args: ['{{ include "app.fullname" . }}:{{ .Values.service.port }}']
   restartPolicy: Never
-{{- end }}
-{{- end }}
